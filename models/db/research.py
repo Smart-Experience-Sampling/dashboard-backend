@@ -12,6 +12,10 @@ class Research(Base):
     end_time = Column("end_time", DateTime(timezone=True), nullable=False)
 
     def create(id: String, question: String, created_time: datetime, start_time: datetime, end_time: datetime):
+        if not isinstance(start_time, datetime):
+            raise TypeError()
+        if not isinstance(end_time, datetime):
+            raise TypeError()
         research = Research()
         research.id =id
         research.question = question

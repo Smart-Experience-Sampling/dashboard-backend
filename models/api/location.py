@@ -25,7 +25,7 @@ class Location:
         location.parent_id = dbLocation.parent_id
 
         location.parent_location = None
-        location.child_locations = None
+        location.child_locations = []
         if (location.parent_id != None):
             match parents:
                 case Relationships.DIRECT:

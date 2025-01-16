@@ -26,7 +26,7 @@ def getBeaconsByClickId(click_id):
     beaconIds = []
     for beaconClick in beaconClicks:
         beaconIds.append({
-            "beacon": session.query(Beacon).filter(Beacon.id == beaconClick.beacon_id).first(),
+            "beacon": getBeacon(beaconClick.beacon_id),
             "distance": beaconClick.distance})
 
     return beaconIds
