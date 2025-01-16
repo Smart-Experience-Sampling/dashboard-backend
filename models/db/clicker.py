@@ -17,9 +17,3 @@ class Clicker(Base):
     def new(uid: Integer):
         clicker = Clicker.create(generateUuid(), uid)
         return clicker
-
-    def value(self):
-        return {
-            "id": self.id,
-            "uid": self.uid
-        }

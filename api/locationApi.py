@@ -1,4 +1,4 @@
-import json
+from functions.json import json
 from flask import Blueprint, request
 from sqlalchemy import select
 from functions.locationFunctions import getLocation
@@ -20,11 +20,7 @@ def getAllLocations():
     for location in tempArr:
         arr.append(location)
     session.close()
-    return json.dumps(
-            arr,
-            default=lambda o: o.__dict__, 
-            sort_keys=True,
-            indent=4), 200
+    return json(arr), 200
 
 @app.route("root")
 def getRootLocations():
@@ -35,11 +31,7 @@ def getRootLocations():
     for location in tempArr:
         arr.append(location)
     session.close()
-    return json.dumps(
-            arr,
-            default=lambda o: o.__dict__, 
-            sort_keys=True,
-            indent=4), 200
+    return json(arr), 200
 
 @app.route("", methods=["POST"])
 def create():
@@ -63,4 +55,4 @@ def create():
     
     location = ApiLocation.fromDb(getLocation(dbLocation.id), Relationships.ALL, Relationships.ALL)
     
-    return location.toJSON(), 200
+    return json(location), 200

@@ -2,7 +2,7 @@ from flask import Blueprint, request
 from util.session import Session
 from models.db.clicker import Clicker
 
-import json
+from functions.json import json
 
 from sqlalchemy import func, select, or_, and_
 
@@ -16,8 +16,8 @@ def getAllClickers():
     arr = []
     print(request)
     for clicker in session.scalars(request):
-        arr.append(clicker.value())
-    return json.dumps(arr), 200
+        arr.append(clicker)
+    return json(arr), 200
 
 @app.route("/location/<location_id>")
 
@@ -27,8 +27,8 @@ def getClickerById(clicker_id):
     request = session.query(Clicker).filter(Clicker.id == clicker_id).first()
 
     if (request == None):
-        return json.dumps(Clicker().value()), 200
-    return json.dumps(request.value()), 200
+        return json(Clicker()), 200
+    return json(request), 200
 
 @app.route("/register/<clicker_uid>", methods=["POST"])
 def registerClicker(clicker_uid):
@@ -37,4 +37,4 @@ def registerClicker(clicker_uid):
     session.add(newClicker)
     session.commit()
 
-    return json.dumps(newClicker.value()), 200
+    return json(newClicker), 200

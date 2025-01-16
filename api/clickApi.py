@@ -1,7 +1,7 @@
 from datetime import datetime
 from flask import Blueprint, request
 from sqlalchemy import select
-import json
+from functions.json import json
 
 from util.flask import io
 
@@ -39,7 +39,7 @@ def getAll():
             
         arr.append(tempClick.toJSON())
     session.close()
-    return json.dumps(arr), 200
+    return json(arr), 200
 
 @app.route("", methods=["POST"])
 def create():
