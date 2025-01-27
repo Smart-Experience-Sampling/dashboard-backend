@@ -7,6 +7,8 @@ from functions.json import json
 
 from sqlalchemy import func, select, or_, and_
 
+from functions.beaconFunctions import getBeaconsForLocation
+
 
 app = Blueprint("beacon", __name__)
 
@@ -20,7 +22,12 @@ def getAllBeacons():
         arr.append(beacon.value())
     return json(arr), 200
 
-@app.route("/location/<location_id>")
+@app.route("/location/<locationId>")
+def getAtLocation(locationId):
+    request = getBeaconsForLocation(locationId)
+    if (request == None):
+        return json([]), 200
+    return json(request), 200
 
 @app.route("/<beacon_id>")
 def getBeaconById(beacon_id):
@@ -33,10 +40,17 @@ def getBeaconById(beacon_id):
 
 @app.route("/register/<beacon_uid>", methods=["POST"])
 def registerBeacon(beacon_uid):
+    jsonData = request.get_json()
+    print(jsonData)
+    
+    location_id = jsonData["location_id"]
+    x = jsonData["x"]
+    y = jsonData["y"]
     session = Session()
-    newBeacon = DbBeacon.new(beacon_uid)
+    newBeacon = DbBeacon.new(beacon_uid, x, y, location_id)
     print(newBeacon.value())
     session.add(newBeacon)
     session.commit()
 
     return json(ApiBeacon.fromDb(newBeacon)), 200
+

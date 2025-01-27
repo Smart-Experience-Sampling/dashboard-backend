@@ -36,23 +36,32 @@ def getRootLocations():
 @app.route("", methods=["POST"])
 def create():
     session = Session()
+    image = request.files['file']
+    name = request.form['name']
+    parentId = request.form['parentId']
+    # try:
+    #     name = jsonData["name"]
+    # except KeyError:
+    #     return "Model is invalid", 400
+    
+    # try:
+    #     parent_id = jsonData["parent_id"]
+    # except KeyError:
+    #     parent_id = None
+    
+    # dbLocation = DbLocation.new(name, parent_id)
+    # session.add(dbLocation)
+    # session.commit()
+    # session.close()
+    
+    # location = ApiLocation.fromDb(getLocation(dbLocation.id), Relationships.ALL, Relationships.ALL)
+    
+    # return json(location), 200
+
+@app.route("", methods=["DELETE"])
+def delete():
+    session = Session()
     jsonData = request.json
-    force = request.args.get('force')
-    print(force)
-    try:
-        name = jsonData["name"]
-    except KeyError:
-        return "Model is invalid", 400
-    
-    try:
-        parent_id = jsonData["parent_id"]
-    except KeyError:
-        parent_id = None
-    
-    dbLocation = DbLocation.new(name, parent_id)
-    session.add(dbLocation)
-    session.commit()
-    
-    location = ApiLocation.fromDb(getLocation(dbLocation.id), Relationships.ALL, Relationships.ALL)
-    
-    return json(location), 200
+    res = session.query(DbLocation).filter(DbLocation.id == jsonData["id"]).first()
+    location = ApiLocation.fromDb(res, Relationships.NONE, Relationships.ALL)
+    locationArray = flattenLocation(location)

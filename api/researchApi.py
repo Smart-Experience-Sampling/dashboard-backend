@@ -5,6 +5,9 @@ from functions.json import json
 
 from util.session import Session
 from models.db.research import Research
+from models.api.research import Research as ApiResearch
+
+from functions.researchFunctions import getActiveResearchAtTime, getResearchesForLocation
 
 app = Blueprint("research", __name__)
 
@@ -14,11 +17,10 @@ def getActiveResearch():
 
 @app.route("/active/<time>")
 def getActiveResearchAtTime(time):
-    session = Session()
-    req = session.query(Research).filter(Research.start_time < time).filter(Research.end_time > time).first()
+    req = getActiveResearchAtTime(time)
     if (req == None):
         return json(Research()), 200
-    return json(req), 200
+    return req, 200
 
 @app.route("")
 def getAll():
@@ -28,12 +30,23 @@ def getAll():
     print(request)
     for research in session.scalars(request):
         arr.append(research.value())
+    session.close()
+
     return json(arr), 200
+
+@app.route("/<locationId>")
+def getAtLocation(locationId):
+    request = getResearchesForLocation(locationId)
+    if (request == None):
+        return json([]), 200
+    return json(request), 200
+
 
 @app.route("", methods=["POST"])
 def create():
     session = Session()
     jsonData = request.json
+    print(jsonData)
     force = request.args.get('force')
     print(force)
     try:
@@ -41,10 +54,14 @@ def create():
         start_time_string: datetime = jsonData["startTime"]
         start_time = datetime.fromisoformat(start_time_string)
         end_time_string = jsonData["endTime"]
+        location_id = jsonData["locationId"]
         end_time = datetime.fromisoformat(end_time_string)
     except KeyError:
+        session.close()
         return "Model is invalid", 400
+    
     except ValueError:
+        session.close()
         return "Time is not in valid ISO format", 400
     
     numActiveResearches = session.query(
@@ -56,8 +73,10 @@ def create():
     # if another research is already happening at that time, cancel and tell user to use force flag
     # if force flag is used, allow
     
-    research = Research.new(question, start_time, end_time)
+    research = Research.new(question, start_time, end_time, location_id)
     session.add(research)
     session.commit()
+
+    apiResearch: ApiResearch = ApiResearch.fromDb(research)
     
-    return json(research), 200
+    return apiResearch.toJSON(), 200

@@ -1,15 +1,16 @@
 from sqlalchemy import Column, String, Float, ForeignKey, DateTime, func
+from sqlalchemy.orm import relationship 
 
 from util.setup import Base
 from util.generateUuid import generateUuid
-
-from functions.beaconFunctions import getBeacon
 
 class Location(Base):
     __tablename__ = "location"
     id = Column("id", String(36), primary_key=True)
     name = Column("name", String(255))
     parent_id = Column("parent_id", String(36))
+    research = relationship("Research", back_populates="location")
+    beacon = relationship("Beacon", back_populates="location")
 
     def create(id: String, name: String, parent_id: String | None):
         self = Location()

@@ -1,6 +1,8 @@
 from models.db.beacon import Beacon as DbBeacon
 
-class Beacon:
+import json
+
+class Beacon():
     id: str
     uid: str
     x: int
@@ -10,5 +12,15 @@ class Beacon:
         beacon = Beacon()
         beacon.id = dbBeacon.id
         beacon.uid = dbBeacon.uid
+        beacon.x = dbBeacon.x
+        beacon.y = dbBeacon.y
 
         return beacon
+    
+    def toJSON(self):
+            
+        return json.dumps(
+            self,
+            default=lambda o: o.__dict__, 
+            sort_keys=True,
+            indent=4)

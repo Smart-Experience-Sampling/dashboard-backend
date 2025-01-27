@@ -6,14 +6,14 @@ from util.generateUuid import generateUuid
 class Clicker(Base):
     __tablename__ = "clicker"
     id = Column("id", String(36), primary_key=True)
-    uid = Column("uid", Integer, nullable=False) # This is the ID known by the clicker
+    uid = Column("uid", String(255), nullable=False) # This is the ID known by the clicker
 
-    def create(id: String, uid: Integer):
+    def create(id: String, uid: String):
         self = Clicker()
         self.id = id
         self.uid = uid
         return self
 
-    def new(uid: Integer):
+    def new(uid: String):
         clicker = Clicker.create(generateUuid(), uid)
         return clicker
